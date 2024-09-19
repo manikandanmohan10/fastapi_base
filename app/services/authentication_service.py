@@ -27,7 +27,7 @@ class AuthenticationService:
             
             return {"message": "User registered successfully", "status_code": 200}
         except DuplicateKeyError as e:
-            raise HTTPException(detail=str(e), status_code=400)
+            raise HTTPException(status_code=400, detail="Email already registered")
         
     async def login(self, user_data: LoginSchema):
         user = await self._get_user(user_data.email)
@@ -35,7 +35,7 @@ class AuthenticationService:
         if not user['is_active']:
             raise HTTPException(status_code=400, detail="User is disabled")
         
-        if not self.pw_manager.verify_password(user_data.password, user['password']):
+        if not self.pw_manager.verify_passwordd(user_data.password, user['password']):
             raise HTTPException(status_code=400, detail="Password is incorrect")
         
         access_token = self.jwt_manager.create_access_token({'email': user['email']})
