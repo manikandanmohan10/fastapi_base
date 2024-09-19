@@ -12,9 +12,12 @@ class CRUDOperations:
         result = self.collection.insert_one(data)
         return str(result.inserted_id)
 
-    def get(self, document_id: str) -> Dict:
-        """Get a document by its ID."""
-        return self.collection.find_one({"_id": ObjectId(document_id)})
+    def get(self, search_criteria: str) -> Dict:
+        if "_id" in search_criteria and isinstance(search_criteria["_id"], str):
+            # Convert the _id string to ObjectId if searching by _id
+            search_criteria["_id"] = ObjectId(search_criteria["_id"])
+        
+        return self.collection.find_one(search_criteria)
 
     def get_all(self, filters: Dict = {}) -> List[Dict]:
         """Get all documents, optionally filtered."""
