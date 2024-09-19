@@ -1,8 +1,8 @@
 import time
-from fastapi import Request, HTTPException
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
+from app.core.custom_logger import logger
 
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -16,6 +16,7 @@ class CustomMiddleware(BaseHTTPMiddleware):
             
             return response
         except Exception as e:
+            logger.critical(str(e))
             return JSONResponse(
                 status_code=400,
                 content={"detail": str(e)}
