@@ -1,16 +1,19 @@
 from pymongo.errors import DuplicateKeyError
+from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from app.repositories.crud import CRUDOperations
 from app.schema.user_schema import SignUpSchema, LoginSchema
 from app.core.password_manager import PasswordManager
 from app.core.jwt_manager import JWTManager
 from app.core.custom_logger import logger
+from app.models.user import TabUser
+from sqlalchemy.orm import Session
 
 class AuthenticationService:
-    def __init__(self) -> None:
+    def __init__(self, db: Session) -> None:
         self.jwt_manager = JWTManager()
         self.pw_manager = PasswordManager()
-        self.db = CRUDOperations("users")
+        self.db = CRUDOperations(session=db, table=TabUser)
 
     async def _get_user(self, email):
         user = self.db.get({'email': email})
@@ -30,7 +33,7 @@ class AuthenticationService:
             user_details = dict(user_data)
             user_details['is_active'] = True
             self.db.create(user_details)
-            logger.info("User created successfully", user_data)
+            logger.info("User created successfully")
             return {"message": "User registered successfully", "status_code": 200}
         except DuplicateKeyError as e:
             logger.error("Duplicate key, email already registered", str(e))
@@ -54,7 +57,7 @@ class AuthenticationService:
 
         await self._password_verification(password, user['password'])
         
-        self.db.update(user['_id'], {'is_active': False})
+        self.db.update(user['email'], {'is_active': False})
         logger.info("User disabled successfully")
         return {"message": "User is disabled"}
     
