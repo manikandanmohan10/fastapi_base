@@ -37,7 +37,8 @@ class CRUDOperations:
         result = self.session.query(self.table).filter(self.table.email == email).first()
         if not result:
             raise HTTPException(status_code=404, detail="No data found")
-        result['is_active'] = False
+        for key, value in update_data.items():
+            setattr(result, key, value)
         self.session.commit()
 
         return "Modified successfully"

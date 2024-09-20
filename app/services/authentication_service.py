@@ -70,5 +70,5 @@ class AuthenticationService:
         await self._password_verification(user_data.password, user['password'])
         
         logger.info("User enabled successfully")
-        self.db.update(user['_id'], {'is_active': True})
+        self.db.update(user['email'], {'is_active': True})
         return {"message": "User is enabled"}
