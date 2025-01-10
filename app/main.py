@@ -7,8 +7,9 @@ app = FastAPI()
 app.add_middleware(CustomMiddleware)
 app.include_router(user_router)
 
+
 @app.get('/')
 def root():
     return {
-        'message': 'hello world'
+        'message': 'Hello World'
     }
